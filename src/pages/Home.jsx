@@ -6,6 +6,14 @@ import SearchBar from '../components/SearchBar';
 function Home({ favorites, onToggleFavorite }) {
   const [search, setSearch] = useState('');
 
+  // Select only three featured routes for the homepage.
+  const featuredRouteIds = ['B02', 'B04', 'B06'];
+
+  const featuredRoutes = routes.filter((route) =>
+    featuredRouteIds.includes(route.id)
+  );
+
+  // Search across all routes when the user enters a keyword.
   const filteredRoutes = routes.filter((route) => {
     const keyword = search.toLowerCase();
 
@@ -16,6 +24,10 @@ function Home({ favorites, onToggleFavorite }) {
       route.destination.toLowerCase().includes(keyword)
     );
   });
+
+  const displayedRoutes = search.trim()
+    ? filteredRoutes
+    : featuredRoutes;
 
   return (
     <div className="home-page">
@@ -51,28 +63,38 @@ function Home({ favorites, onToggleFavorite }) {
         <div className="section-heading">
           <div>
             <span className="section-label">EXPLORE PEKANBARU</span>
-            <h2>Popular Routes</h2>
-            <p>Find routes that match your destination.</p>
+
+            <h2>
+              {search.trim() ? 'Search Results' : 'Popular Routes'}
+            </h2>
+
+            <p>
+              {search.trim()
+                ? 'Routes matching your search.'
+                : 'Explore some of the featured bus routes in Pekanbaru.'}
+            </p>
           </div>
 
           <span className="route-count">
-            {filteredRoutes.length} Routes
+            {search.trim()
+              ? `${displayedRoutes.length} Routes Found`
+              : '3 Featured Routes'}
           </span>
         </div>
 
         <div className="route-grid">
-          {filteredRoutes.length > 0 ? (
-            filteredRoutes.map((route) => (
-                <RouteCard
-                    key={route.id}
-                    route={route}
-                    favorites={favorites}
-                    onToggleFavorite={onToggleFavorite}
-                />
+          {displayedRoutes.length > 0 ? (
+            displayedRoutes.map((route) => (
+              <RouteCard
+                key={route.id}
+                route={route}
+                favorites={favorites}
+                onToggleFavorite={onToggleFavorite}
+              />
             ))
           ) : (
             <p className="empty-message">
-              No routes found. Try other keywords.
+              No routes found. Try another keyword.
             </p>
           )}
         </div>
